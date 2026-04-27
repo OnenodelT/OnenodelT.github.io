@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Onenode | Boutique</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #020617; 
+            color: #f8fafc; 
+            /* Pas de overflow: hidden ici, l'acheteur DOIT pouvoir scroller pour voir les produits */
+        }
+
+        /* Arrière-plan subtil pour maintenir la charte */
+        .ambient-light {
+            position: fixed; /* Fixed pour rester visible pendant le scroll */
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.2;
+            z-index: -1;
+        }
+        .light-blue { top: -20%; left: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, #3b82f6, transparent); }
+        .light-emerald { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, #10b981, transparent); }
+
+        /* Effet Verre */
+        .glass-header {
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glass-card:active { transform: scale(0.98); }
+
+        /* Masquer la barre de défilement du menu horizontal */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Animation d'apparition des produits */
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .product-card { animation: fadeInScale 0.4s ease-out forwards; }
+    </style>
+</head>
+<body class="min-h-screen relative pb-12">
+
+    <!-- Lumières de fond -->
+    <div class="ambient-light light-blue"></div>
+    <div class="ambient-light light-emerald"></div>
+
+    <!-- ==========================================
+         EN-TÊTE FIXE (Sticky Header)
+         ========================================== -->
+    <header class="sticky top-0 z-50 glass-header px-4 py-4 flex items-center justify-between shadow-lg">
+        <!-- Bouton Retour crucial pour une architecture multi-pages -->
+        <a href="index.html" class="p-2 bg-slate-800/80 rounded-full text-slate-300 hover:text-white hover:bg-slate-700 transition-all active:scale-90">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </a>
+        
+        <h2 class="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">
+            Catalogue
+        </h2>
+        
+        <!-- Bouton Assistant Vocal -->
+        <button id="voice-toggle" onclick="toggleVoice()" class="p-2 bg-blue-600/20 text-blue-400 rounded-full hover:bg-blue-600/40 active:scale-90 transition-all flex items-center gap-2 px-4 border border-blue-500/20">
+            <i data-lucide="mic" class="w-4 h-4"></i>
+            <span class="text-sm font-semibold hidden sm:inline text-white">Vocal</span>
+        </button>
+    </header>
+
+    <!-- ==========================================
+         BARRE DE CATÉGORIES (Slider Horizontal)
+         ========================================== -->
+    <div class="mt-6 px-4 sticky top-[72px] z-40 bg-[#020617]/90 backdrop-blur-md py-2 -mx-4 px-4 border-b border-slate-800/50">
+        <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="category-container">
+            <!-- Les boutons seront générés ici par JavaScript -->
+        </div>
+    </div>
+
+    <!-- ==========================================
+         GRILLE DES PRODUITS
+         ========================================== -->
+    <main class="mt-6 px-4 max-w-5xl mx-auto w-full">
+        <div class="flex items-center justify-between mb-6">
+            <h3 id="current-category-title" class="text-2xl font-extrabold text-white">Tous les articles</h3>
+            <span id="item-count" class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded-md">0</span>
+        </div>
+        
+        <!-- Conteneur Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6" id="products-container">
+            <!-- Les articles seront générés ici par JavaScript -->
+        </div>
+    </main>
+
+    <script>
+        // Initialiser les icônes
+        lucide.createIcons();
+
+        // =====================================================================
+        // ⚠️ ZONE DE BASE DE DONNÉES LOCALE (C'est ici que tu modifies) ⚠️
+        // =====================================================================
+        
+        // 1. Les Catégories
+        const categories = ["Tous", "Cosmétique", "Vêtement", "Chaussures", "Chaînes", "Coliers", "Sacs", "Accessoires", "Électronique"];
+
+        // 2. Les Produits (J'ai mis 0$ partout comme tu l'as demandé)
+        // Remplace les "Image.JPEG" par les noms exacts de tes fichiers.
+        const products = [
+{ id: 1, cat: "Cosmétique", name: "Parfum Blithe", price: "12,000FC", img: "ParfumBlithe.JPEG", phone: "243893415679" },
+
+            { id: 2, cat: "Cosmétique", name: "Olive Oil", price: "10,000FC", img: "Olivehuil.JPEG", phone: "243893415679" },
+
+{ id: 3, cat: "Cosmétique", name: "Olive Oil gel Max", price: "15,000FC", img: "Olivehuilgelmax.JPEG", phone: "243893415679" },
+            
+            { id: 4, cat: "Vêtement", name: "Puffer jacket", price: "45,000FC", img: "Puffer jacket.JPEG", phone: "243994240332" },
+
+            { id: 5, cat: "Vêtement", name: "Pull fashion YP", price: "45,000FC", img: "PullfashionYP.JPEG", phone: "243994240332" },
+
+{ id: 6, cat: "Vêtement", name: "veste pour homme", price: "45,000FC", img: "vestepourhomme.JPEG", phone: "243994240332" },
+
+{ id: 7, cat: "Vêtement", name: "pantalon jean", price: "30,000FC", img: "pantalonjean.JPEG", phone: "243994240332" },
+            
+            { id: 8, cat: "Chaussures", name: "New Balance", price: "80,000FC", img: "NewBalance.JPEG", phone: "243983065197" },
+            { id: 9, cat: "Chaussures", name: "Sneakers TL", price: "80,000FC", img: "SneakersTL.JPEG", phone: "243983065197" },
+
+{ id: 10, cat: "Chaussures", name: "Mocassins alinkton", price: "50$", img: "Mocassinsalinkton.JPEG", phone: "243983065197" },
+
+{ id: 11, cat: "Chaussures", name: "Mocassins Triple semelle", price: "45$", img: "Mocassinstriplesemelle.JPEG", phone: "243983065197" },
+
+{ id: 12, cat: "Chaussures", name: "slide", price: "20,000FC", img: "slide.JPEG", phone: "243983065197" },
+
+{ id: 13, cat: "Chaînes", name: "croix", price: "15,000FC", img: "Chaîneencroix.JPEG", phone: "243983065197" },
+
+{ id: 14, cat: "Chaînes", name: "coeur", price: "15,000FC", img: "Chaîneencoeur.JPEG", phone: "243983065197" },
+
+{ id: 15, cat: "Chaînes", name: "barre d'acier", price: "15,000FC", img: "Chaîneenbarre.JPEG", phone: "243983065197" },
+
+{ id: 16, cat: "Chaînes", name: "barre blanche & noire", price: "15,000FC", img: "Chaînesenbarres.JPEG", phone: "243983065197" },
+
+{ id: 17, cat: "Chaînes", name: "croix d'acier", price: "15,000FC", img: "Chaîneencroixd'acier.JPEG", phone: "243983065197" },
+
+{ id: 18, cat: "Coliers", name: "croix noire", price: "15,000FC", img: "Colierencroix.JPEG", phone: "243983065197" },
+
+{ id: 19, cat: "Coliers", name: "Barre noire", price: "15,000FC", img: "Colierenbarrenoire.JPEG", phone: "243983065197" },
+
+{ id: 20, cat: "Accessoires", name: "vozol puff", price: "15,000FC", img: "vozolpuff.JPEG", phone: "243994240332" },
+
+{ id: 21, cat: "Accessoires", name: "Gourde", price: "25,000FC", img: "Gourde.JPEG", phone: "243994240332" },
+
+{ id: 22, cat: "Accessoires", name: "montre casio", price: "25$", img: "montrecasio.JPEG", phone: "243983065197" },
+            
+            { id: 22, cat: "Électronique", name: "iPhone 11 normal 64Go", price: "150$", img: "iPhone11normal.jpeg", phone: "243893415679" }
+        ];
+
+        // =====================================================================
+        // MOTEUR LOGIQUE (Ne touche pas si tu ne sais pas coder)
+        // =====================================================================
+
+        // --- Système Vocal ---
+        let voiceEnabled = false;
+
+        function toggleVoice() {
+            voiceEnabled = !voiceEnabled;
+            const btn = document.getElementById('voice-toggle');
+            
+            if(voiceEnabled) {
+                // Style Activé (Bleu solide)
+                btn.classList.replace('bg-blue-600/20', 'bg-blue-600');
+                btn.classList.replace('text-blue-400', 'text-white');
+                speakText("Mode vocal activé. Sélectionnez une section.");
+            } else {
+                // Style Désactivé (Fantôme)
+                btn.classList.replace('bg-blue-600', 'bg-blue-600/20');
+                btn.classList.replace('text-white', 'text-blue-400');
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        function speakText(text) {
+            if (!voiceEnabled || !('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel(); // Coupe la phrase précédente
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'fr-FR';
+            utterance.rate = 1.1; // Légèrement plus rapide pour ne pas être ennuyeux
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // --- Génération de l'interface ---
+        function renderCategories() {
+            const container = document.getElementById('category-container');
+            container.innerHTML = '';
+            
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                // Design des boutons de catégorie (pillules)
+                btn.className = "flex-shrink-0 px-5 py-2 glass-card rounded-full text-sm font-bold text-slate-300 hover:text-white hover:border-blue-500/50 hover:bg-blue-600/20 transition-all";
+                btn.innerText = cat;
+                
+                btn.onclick = () => {
+                    const title = cat === "Tous" ? "Tous les articles" : cat;
+                    document.getElementById('current-category-title').innerText = title;
+                    
+                    // Retour vocal de la section choisie
+                    speakText("Section " + title);
+                    
+                    // Filtrage
+                    renderProducts(cat === "Tous" ? null : cat);
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function openWhatsApp(phone, itemName) {
+            // Encode l'URL pour gérer les espaces et caractères spéciaux
+            const message = encodeURIComponent(`Bonjour, je suis intéressé par l'article : ${itemName} vu sur Onenode.`);
+            window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+        }
+
+        function renderProducts(filterCat = null) {
+            const container = document.getElementById('products-container');
+            const countDisplay = document.getElementById('item-count');
+            container.innerHTML = '';
+            
+            // Filtre les produits
+            const filtered = filterCat ? products.filter(p => p.cat === filterCat) : products;
+            
+            // Met à jour le compteur
+            countDisplay.innerText = filtered.length + " article(s)";
+
+            if(filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-16 text-slate-500">
+                        <i data-lucide="package-x" class="w-12 h-12 mb-3 opacity-50"></i>
+                        <p class="font-medium">Aucun article dans cette section pour le moment.</p>
+                    </div>`;
+                lucide.createIcons();
+                return;
+            }
+
+            // Génère les cartes (avec délai d'animation)
+            filtered.forEach((p, index) => {
+                const card = document.createElement('div');
+                card.className = "glass-card product-card rounded-2xl overflow-hidden flex flex-col group";
+                // Délai d'animation en cascade
+                card.style.animationDelay = `${index * 0.05}s`; 
+                
+                card.innerHTML = `
+                    <div class="h-36 sm:h-48 w-full bg-slate-800 flex items-center justify-center relative overflow-hidden">
+                        <!-- L'image locale. Le onerror met un fond gris si l'image n'est pas trouvée dans le dossier -->
+                        <img src="${p.img}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" alt="${p.name}" class="w-full h-full object-cover relative z-10 group-hover:scale-110 transition-transform duration-700">
+                        <!-- Texte de secours si image absente (Pratique pour tes tests) -->
+                        <span style="display:none;" class="absolute z-0 text-xs text-slate-500 font-mono">${p.img}</span>
+                        
+                        <!-- Prix (Pastille) -->
+                        <span class="absolute top-2 right-2 z-20 bg-emerald-500 text-slate-900 text-xs px-2.5 py-1 rounded-lg font-extrabold shadow-lg shadow-emerald-500/20 backdrop-blur-md">
+                            ${p.price}
+                        </span>
+                    </div>
+                    <div class="p-3 sm:p-4 flex flex-col flex-1">
+                        <span class="text-[10px] sm:text-xs uppercase tracking-widest text-blue-400 font-bold mb-1">${p.cat}</span>
+                        <h4 class="font-bold text-sm sm:text-base text-white mb-4 line-clamp-1">${p.name}</h4>
+                        
+                        <button onclick="openWhatsApp('${p.phone}', '${p.name}')" class="mt-auto w-full bg-white hover:bg-slate-200 text-slate-900 text-xs sm:text-sm font-extrabold py-2.5 sm:py-3 rounded-xl flex items-center justify-center gap-2 transition-colors active:scale-95">
+                            <i data-lucide="message-circle" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500"></i>
+                            Acheter
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // --- Lancement au chargement ---
+        window.onload = () => {
+            renderCategories();
+            renderProducts();
+        };
+    </script>
+</body>
+</html>

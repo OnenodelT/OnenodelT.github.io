@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Onenode | Espace Partenaire</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #020617; 
+            color: #f8fafc; 
+        }
+
+        /* Ambient Lights - Charte Graphique Onenode */
+        .ambient-light {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.2;
+            z-index: -1;
+        }
+        .light-blue { top: -20%; left: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, #3b82f6, transparent); }
+        .light-emerald { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, #10b981, transparent); }
+
+        /* Effet Glassmorphism */
+        .glass-header {
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .glass-box {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Animation d'entrée du formulaire */
+        .fade-in-up {
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Animation de pop pour le changement de prix */
+        @keyframes pricePop {
+            0% { transform: scale(1); color: #10b981; }
+            50% { transform: scale(1.1); color: #34d399; }
+            100% { transform: scale(1); color: #10b981; }
+        }
+        .pop-anim { animation: pricePop 0.3s ease-out; }
+        
+        /* Personnalisation de l'input number (masquer les flèches par défaut) */
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"] { -moz-appearance: textfield; }
+        
+        /* Désactiver la sélection de texte sur l'input readonly */
+        .no-select { user-select: none; -webkit-user-select: none; }
+    </style>
+</head>
+<body class="min-h-screen relative pb-12">
+
+    <div class="ambient-light light-blue"></div>
+    <div class="ambient-light light-emerald"></div>
+
+    <!-- ==========================================
+         EN-TÊTE FIXE
+         ========================================== -->
+    <header class="sticky top-0 z-50 glass-header px-4 py-4 flex items-center shadow-lg gap-4">
+        <a href="index.html" class="p-2 bg-slate-800/80 rounded-full text-slate-300 hover:text-white hover:bg-slate-700 transition-all active:scale-90">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </a>
+        <h2 class="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-200">
+            Espace Partenaire
+        </h2>
+    </header>
+
+    <!-- ==========================================
+         CORPS DU FORMULAIRE
+         ========================================== -->
+    <main class="mt-8 px-4 max-w-md mx-auto w-full fade-in-up">
+        
+        <div class="mb-8 text-center">
+            <div class="inline-flex p-4 bg-emerald-500/10 rounded-3xl mb-4 border border-emerald-500/20">
+                <i data-lucide="store" class="w-10 h-10 text-emerald-400"></i>
+            </div>
+            <h1 class="text-3xl font-extrabold text-white mb-2">Créez votre vitrine</h1>
+            <p class="text-slate-400 text-sm">Configurez votre boutique et touchez des centaines d'acheteurs locaux directement sur WhatsApp.</p>
+        </div>
+
+        <form id="seller-form" class="space-y-6" onsubmit="handleFormSubmit(event)">
+            
+            <!-- NOM DE LA BOUTIQUE -->
+            <div class="space-y-2">
+                <label for="seller-name" class="block text-sm font-bold text-slate-300 ml-1">Nom de la boutique</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i data-lucide="tag" class="w-5 h-5 text-slate-500"></i>
+                    </div>
+                    <input type="text" id="seller-name" required 
+                        class="w-full bg-slate-900/80 border border-slate-700 rounded-2xl pl-12 pr-4 py-4 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all shadow-inner" 
+                        placeholder="Ex: Exaucé Cosmétiques">
+                </div>
+            </div>
+
+            <!-- NUMÉRO WHATSAPP -->
+            <div class="space-y-2">
+                <label for="seller-phone" class="block text-sm font-bold text-slate-300 ml-1">Numéro WhatsApp Vendeur</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i data-lucide="phone" class="w-5 h-5 text-slate-500"></i>
+                    </div>
+                    <input type="tel" id="seller-phone" required 
+                        class="w-full bg-slate-900/80 border border-slate-700 rounded-2xl pl-12 pr-4 py-4 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all shadow-inner" 
+                        placeholder="+243 ...">
+                </div>
+            </div>
+
+            <!-- CALCULATEUR DE PRIX DYNAMIQUE (Par intervalles stricts) -->
+            <div class="glass-box p-6 rounded-[2rem] border border-emerald-500/30 relative overflow-hidden group hover:border-emerald-500/50 transition-colors">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                
+                <label class="block text-sm font-bold text-emerald-400 mb-4 relative z-10">Combien d'articles à poster ?</label>
+                
+                <div class="flex items-center gap-4 relative z-10">
+                    <div class="relative flex items-center w-40">
+                        <!-- Bouton Moins -->
+                        <button type="button" onclick="updateCount(-1)" class="absolute left-0 p-3 text-emerald-400 hover:text-emerald-300 transition-colors bg-slate-800 rounded-l-xl h-full border border-slate-700 hover:bg-slate-700">
+                            <i data-lucide="minus" class="w-5 h-5"></i>
+                        </button>
+                        
+                        <!-- Input en lecture seule (Poka-Yoke) -->
+                        <input type="text" id="seller-articles" value="5" readonly 
+                            class="no-select w-full bg-slate-900 border-y border-slate-700 px-12 py-3 text-center text-2xl font-black text-white focus:outline-none shadow-inner cursor-default">
+                        
+                        <!-- Bouton Plus -->
+                        <button type="button" onclick="updateCount(1)" class="absolute right-0 p-3 text-emerald-400 hover:text-emerald-300 transition-colors bg-slate-800 rounded-r-xl h-full border border-slate-700 hover:bg-slate-700">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <span class="text-slate-400 text-xs font-semibold uppercase tracking-widest">Articles</span>
+                </div>
+
+                <div class="mt-6 pt-5 border-t border-slate-700/50 flex justify-between items-end relative z-10">
+                    <div class="flex flex-col">
+                        <span class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Prix de l'abonnement</span>
+                        <span class="text-slate-300 text-sm">Validé automatiquement</span>
+                    </div>
+                    <span id="price-display" class="text-4xl font-black text-emerald-400 tracking-tighter transition-all">2,5$</span>
+                </div>
+            </div>
+
+            <!-- CHECKBOX ENGAGEMENT -->
+            <label class="flex items-start gap-4 p-5 bg-slate-900/50 rounded-2xl cursor-pointer hover:bg-slate-800/80 transition-colors border border-transparent hover:border-slate-700">
+                <div class="relative flex items-center justify-center mt-0.5">
+                    <input type="checkbox" required class="peer appearance-none w-6 h-6 border-2 border-slate-600 rounded-lg checked:bg-emerald-500 checked:border-emerald-500 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:ring-offset-2 focus:ring-offset-slate-900">
+                    <i data-lucide="check" class="absolute w-4 h-4 text-slate-900 opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"></i>
+                </div>
+                <span class="text-sm text-slate-300 leading-relaxed font-medium">
+                    Je confirme vouloir souscrire à cet abonnement mensuel et j'accepte les conditions de diffusion de la plateforme.
+                </span>
+            </label>
+
+            <!-- BOUTON DE SOUMISSION -->
+            <button type="submit" class="w-full group relative flex items-center justify-center gap-3 p-5 bg-emerald-500 text-slate-950 rounded-2xl font-extrabold text-lg hover:bg-emerald-400 transition-all active:scale-[0.98] shadow-[0_0_40px_rgba(16,185,129,0.3)] overflow-hidden">
+                <div class="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300"></div>
+                <i data-lucide="send" class="w-6 h-6 relative z-10"></i>
+                <span class="relative z-10">Soumettre ma demande</span>
+            </button>
+
+            <p class="text-center text-xs text-slate-500 font-medium">
+                Le formulaire sera envoyé à l'équipe Onenode via votre application e-mail.
+            </p>
+
+        </form>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        // ==========================================
+        // LOGIQUE DES INTERVALLES STRICTS
+        // ==========================================
+        
+        // Voici tes paliers exacts : 5, 10 et 20. Rien d'autre n'est permis.
+        const allowedTiers = [5, 10, 20];
+        const tierPrices = ["2,5$", "4,5$", "8$"]; // Les prix correspondants
+        
+        // On commence au premier palier (index 0 qui équivaut à 5 articles)
+        let currentTierIndex = 0;
+
+        function updateCount(direction) {
+            const display = document.getElementById('price-display');
+            
+            // On modifie l'index en fonction du clic (+1 ou -1)
+            currentTierIndex += direction;
+            
+            // On bloque aux limites du tableau (on ne peut pas aller en dessous de 0 ou au dessus de 2)
+            if (currentTierIndex < 0) currentTierIndex = 0;
+            if (currentTierIndex >= allowedTiers.length) currentTierIndex = allowedTiers.length - 1;
+            
+            // Mise à jour de la vue (Articles)
+            document.getElementById('seller-articles').value = allowedTiers[currentTierIndex];
+            
+            // Mise à jour de la vue (Prix) avec animation
+            const newPrice = tierPrices[currentTierIndex];
+            
+            if (display.innerText !== newPrice) {
+                display.innerText = newPrice;
+                // Animation de pop (Hack CSS pour rejouer l'animation)
+                display.classList.remove('pop-anim');
+                void display.offsetWidth;
+                display.classList.add('pop-anim');
+            }
+        }
+
+        // ==========================================
+        // SOUMISSION ET REDIRECTION EMAIL (AVEC PRIX)
+        // ==========================================
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            // Récupération des données validées
+            const name = document.getElementById('seller-name').value;
+            const phone = document.getElementById('seller-phone').value;
+            const articles = document.getElementById('seller-articles').value; // Va récupérer 5, 10 ou 20
+            const price = document.getElementById('price-display').innerText; // Va récupérer 2,5$, 4,5$ ou 8$
+
+            // Email d'administration
+            const targetEmail = "digitalinformer51@gmail.com";
+            
+            // Construction du corps du message (le prix Y EST)
+            const subject = encodeURIComponent(`Nouveau Vendeur : ${name}`);
+            const body = encodeURIComponent(
+                `Bonjour,\n\n` +
+                `Nouvelle demande de création de boutique validée :\n\n` +
+                `------------------------------------\n` +
+                `🏢 BOUTIQUE : ${name}\n` +
+                `📱 WHATSAPP : ${phone}\n` +
+                `📦 ARTICLES CHOISIS : ${articles} articles\n` +
+                `💰 PRIX À FACTURER : ${price} par mois\n` +
+                `------------------------------------\n\n` +
+                `Le vendeur a confirmé son accord pour le paiement de l'abonnement.\n`
+            );
+
+            // Ouverture du client mail
+            window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
+            
+            // Feedback visuel du bouton
+            const btn = event.target.querySelector('button[type="submit"]');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="check-circle" class="w-6 h-6"></i> Redirection...`;
+            btn.classList.replace('bg-emerald-500', 'bg-slate-700');
+            lucide.createIcons();
+
+            // Reset de la page après 3 secondes
+            setTimeout(() => {
+                event.target.reset();
+                currentTierIndex = 0; // Remet au palier de 5
+                document.getElementById('seller-articles').value = allowedTiers[0];
+                document.getElementById('price-display').innerText = tierPrices[0];
+                
+                btn.innerHTML = originalHTML;
+                btn.classList.replace('bg-slate-700', 'bg-emerald-500');
+                lucide.createIcons();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
