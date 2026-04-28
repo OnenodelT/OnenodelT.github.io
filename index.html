@@ -56,6 +56,24 @@
         @keyframes fadeInUp {
             to { opacity: 1; transform: translateY(0); }
         }
+
+        @keyframes lampGlow {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.75;
+                filter: drop-shadow(0 0 10px rgba(103, 232, 249, 0.35));
+            }
+            50% {
+                transform: scale(1.06);
+                opacity: 1;
+                filter: drop-shadow(0 0 22px rgba(103, 232, 249, 0.8));
+            }
+        }
+
+        @keyframes beamPulse {
+            0%, 100% { opacity: 0.18; transform: translateY(0) scaleX(1); }
+            50% { opacity: 0.38; transform: translateY(2px) scaleX(1.04); }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-6 relative">
@@ -95,16 +113,22 @@
                 <i data-lucide="arrow-right" class="w-6 h-6 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all z-10"></i>
             </a>
 
-            <!-- BOUTON VENDEUR (Contraste cognitif, appel au profit) -->
-            <a href="vendeur.html" class="group relative w-full flex items-center justify-between p-6 bg-slate-800/80 backdrop-blur-md text-white border border-slate-700/50 rounded-3xl font-bold text-xl hover:bg-slate-800 transition-all duration-300 shadow-xl hover:border-emerald-500/50 hover:shadow-[0_8px_40px_rgba(16,185,129,0.15)] active:scale-[0.98]">
-                <div class="relative flex items-center gap-4 z-10">
-                    <div class="p-3 bg-slate-700/50 rounded-2xl group-hover:bg-emerald-500/20 transition-colors duration-300">
-                        <i data-lucide="store" class="w-6 h-6 text-emerald-400"></i>
+            <!-- TEXTE AVEC LAMPE TECH -->
+            <div class="w-full flex flex-col items-center justify-center pt-2 pb-1">
+                <div class="relative flex items-center justify-center mb-4 fade-in-up" style="animation-delay: 0.45s;">
+                    <div class="absolute w-52 h-24 rounded-full bg-cyan-400/15 blur-3xl" style="animation: beamPulse 2.8s ease-in-out infinite;"></div>
+                    <div class="absolute w-32 h-20 rounded-full bg-cyan-300/10 blur-2xl" style="animation: beamPulse 2.8s ease-in-out infinite; animation-delay: .2s;"></div>
+
+                    <div class="relative w-16 h-16 rounded-full border border-cyan-300/40 bg-slate-900/60 flex items-center justify-center shadow-[0_0_30px_rgba(34,211,238,0.45)]"
+                         style="animation: lampGlow 2.8s ease-in-out infinite;">
+                        <i data-lucide="lightbulb" class="w-7 h-7 text-cyan-300"></i>
                     </div>
-                    Je veux vendre
                 </div>
-                <i data-lucide="arrow-right" class="w-6 h-6 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all z-10"></i>
-            </a>
+
+                <p class="text-center text-base sm:text-lg font-semibold leading-snug text-slate-100 max-w-[16rem] fade-in-up" style="animation-delay: 0.55s;">
+                    Découvrez des articles tendance à des prix accessibles.
+                </p>
+            </div>
         </div>
 
         <!-- Réassurance subtile (Social Proof basique) -->
